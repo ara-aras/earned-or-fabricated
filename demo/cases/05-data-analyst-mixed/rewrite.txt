@@ -1,0 +1,16 @@
+SNEHA KAMATH
+sneha.kamath@example.com | +91 99000 56789 | Bengaluru
+Summary
+Data analyst who builds Power BI and Tableau dashboards, automates reporting with SQL and Python, and presents insights to senior leadership.
+Skills
+SQL, Python, Power BI, Tableau, Excel, data cleaning, A/B testing, KPI reporting, pivot tables
+Experience
+Junior Data Analyst 02/2023 to Current Coastal Distributors
+- Built interactive Power BI dashboards for weekly sales reporting used by senior leadership.
+- Wrote SQL queries and Python scripts that automated order reporting, cutting report time by 30%.
+- Cleaned customer data and removed duplicate records.
+- Led the monthly KPI reporting project and ran A/B tests on regional promotions.
+Education
+Bachelor of Science, Statistics, 2022
+Certifications
+Google Data Analytics Certificate

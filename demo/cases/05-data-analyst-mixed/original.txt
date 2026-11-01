@@ -1,0 +1,14 @@
+SNEHA KAMATH
+sneha.kamath@example.com | +91 99000 56789 | Bengaluru
+Summary
+Junior data analyst preparing sales reports for a regional distributor.
+Skills
+Excel, SQL, data cleaning, pivot tables
+Experience
+Junior Data Analyst 02/2023 to Current Coastal Distributors
+- Prepared weekly sales reports in Excel for the sales manager.
+- Wrote SQL queries to pull order data from the company database.
+- Cleaned customer data and removed duplicate records.
+- Helped the team build a monthly KPI summary.
+Education
+Bachelor of Science, Statistics, 2022

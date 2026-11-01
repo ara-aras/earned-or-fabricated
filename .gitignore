@@ -1,0 +1,54 @@
+# Python (backend)
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.log
+backend/server.log
+*.pyc
+
+# Trained weights are regenerable via scripts/train_readouts.py -- keep them
+# out of git so the repo doesn't carry binary npz blobs, but do NOT ignore
+# the scripts that produce them.
+backend/app/weights/*.npz
+
+# Research pipeline: dataset (Kaggle licence), LLM cache, run outputs, labelling sheets
+backend/research/data/Resume.csv
+backend/research/cache/
+backend/research/results/
+backend/research/labels/
+.pytest_cache/
+
+# Node / Next.js (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/*.log
+frontend/frontend.log
+frontend/next-env.d.ts
+frontend/tsconfig.tsbuildinfo
+frontend/.env*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local scratch/test artifacts
+backend/_test_*.json
+backend/_eval_*.json
+backend/_resume_text.txt
+backend/bin/
+backend/.cache/
+ngrok.log
+
+# Report: the college template (another project's report) and build scratch stay local
+docs/23CSMPB03-REPORT.docx
+docs/report/build/work/
+
+# Secrets and local docs stay out of the public repository
+.env
+.env.*
+!.env.example
+backend/.env
+docs/

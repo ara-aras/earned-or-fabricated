@@ -1,0 +1,18 @@
+AISHA RAHMAN
+aisha.rahman@example.com | +91 98450 12345 | Mangaluru
+Summary
+Final-year computer science student interested in backend development.
+Skills
+Python, Java, SQL, Git, HTML
+Projects
+Library Management System, 2025
+- Built a library management web app in Python with Flask and SQLite for a college course.
+- Wrote unit tests for the book issue and return features.
+Attendance Tracker, 2024
+- Made a Java desktop app that records class attendance and exports it to Excel.
+Experience
+Web Development Intern 06/2024 to 08/2024 Local Startup
+- Fixed bugs in the company website and updated product pages.
+- Helped the team test new features before release.
+Education
+Bachelor of Engineering, Computer Science, 2026

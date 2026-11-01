@@ -1,0 +1,49 @@
+{
+ "fetched_at": "sample",
+ "jobs": [
+  {
+   "id": "s-it-1",
+   "category": "INFORMATION-TECHNOLOGY",
+   "title": "Cloud Support Engineer",
+   "tags": [
+    "kubernetes",
+    "linux",
+    "aws"
+   ],
+   "description": "We are hiring a cloud support engineer to troubleshoot customer workloads on AWS. You will work with Linux, Kubernetes and Terraform, write Python scripts to automate support tasks, and lead incident reviews. Experience with networking and monitoring tools is a plus. You will partner with engineering teams to improve reliability, document fixes, and mentor junior staff on cloud best practices across a fast-growing platform."
+  },
+  {
+   "id": "s-hr-1",
+   "category": "HR",
+   "title": "HR Generalist",
+   "tags": [
+    "recruitment",
+    "hris",
+    "payroll"
+   ],
+   "description": "Our HR generalist owns recruitment, onboarding and employee relations for a 500-person company. You will manage the HRIS, run payroll checks, lead training programs and advise managers on policy. Experience with Workday or similar HRIS, strong Excel skills and knowledge of employment law are required. You will report on HR metrics such as turnover and time to hire to leadership every month."
+  },
+  {
+   "id": "s-sales-1",
+   "category": "SALES",
+   "title": "Account Executive",
+   "tags": [
+    "salesforce",
+    "crm",
+    "negotiation"
+   ],
+   "description": "We need an account executive to manage the full sales cycle for mid-market customers. You will prospect, run discovery calls and demos, negotiate contracts, and close new business. Experience with Salesforce, forecasting pipeline and exceeding quota is expected. You will collaborate with marketing and customer success, and lead quarterly business reviews with key accounts to expand revenue."
+  },
+  {
+   "id": "s-fin-1",
+   "category": "FINANCE",
+   "title": "FP&A Analyst",
+   "tags": [
+    "excel",
+    "tableau",
+    "financial modeling"
+   ],
+   "description": "The FP&A analyst builds financial models, owns monthly variance analysis and supports the annual budget and forecast. You will create dashboards in Tableau, automate reporting with Python or SQL, and present insights to senior leadership. Strong Excel and financial modeling skills are required, and experience in banking or financial services is a plus for this role."
+  }
+ ]
+}

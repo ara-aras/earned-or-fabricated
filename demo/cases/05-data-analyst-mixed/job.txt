@@ -1,0 +1,3 @@
+Data Analyst, Meridian Health Insurance
+
+We are hiring a data analyst to build dashboards in Power BI and Tableau, write SQL and Python to automate reporting, and present insights to senior leadership. You will clean claims data, run A/B tests, and own weekly KPI reports. A Google Data Analytics Certificate or similar is a plus. Experience leading small analytics projects is preferred.

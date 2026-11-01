@@ -1,0 +1,3 @@
+Software Engineer Intern (Backend), Northwind Cloud
+
+We are looking for a backend software engineer intern to build REST APIs in Python and Java. You will containerise services with Docker, deploy them on AWS, and work with Kubernetes, PostgreSQL and Redis. Familiarity with React for internal dashboards, Git, CI/CD pipelines and unit testing is a plus. You will collaborate with senior engineers, take part in code reviews and help improve API performance and reliability.

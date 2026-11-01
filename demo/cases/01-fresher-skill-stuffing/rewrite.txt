@@ -1,0 +1,19 @@
+AISHA RAHMAN
+aisha.rahman@example.com | +91 98450 12345 | Mangaluru
+Summary
+Backend-focused computer science student with hands-on experience building scalable REST APIs and deploying containerised services on AWS.
+Skills
+Python, Java, SQL, PostgreSQL, Redis, Docker, Kubernetes, AWS, React, Git, CI/CD, REST APIs
+Projects
+Library Management System, 2025
+- Designed and built a library management platform in Python with Flask and PostgreSQL, exposing REST APIs for book issue and return.
+- Containerised the application with Docker and deployed it on AWS EC2 with a CI/CD pipeline.
+- Improved API response time by 40% by adding Redis caching.
+Attendance Tracker, 2024
+- Developed a Java application that records class attendance for 500+ students and exports reports to Excel.
+Experience
+Web Development Intern 06/2024 to 08/2024 Local Startup
+- Led bug-fixing efforts on the company website and built a React dashboard for product updates.
+- Collaborated with senior engineers on code reviews and release testing.
+Education
+Bachelor of Engineering, Computer Science, 2026
