@@ -94,8 +94,9 @@ def audit_rewrite(req: AuditRequest):
         return audit(req.resume_text, req.job.model_dump(), rewrite=pasted, llm=llm, guarded=req.guarded)
     except RuntimeError as exc:   # model server down or model missing
         raise HTTPException(status_code=503, detail=(
-            f"Could not reach the rewriter model ({AUDIT_LLM}). Start Ollama and create the model "
-            f"(see backend/research/README.md), or paste a rewrite and untick the guarded rewrite. {exc}"))
+            f"Could not get a reply from the rewriter model ({AUDIT_LLM}). If you use Groq, check the "
+            f"internet connection and LLM_API_KEY in .env. If you use Ollama, start it and create the model "
+            f"(see backend/research/README.md). You can also paste a rewrite and untick the guarded rewrite. {exc}"))
 
 
 @app.get("/api/demo/cases")
