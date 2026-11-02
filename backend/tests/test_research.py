@@ -256,3 +256,35 @@ def test_markdown_headings_are_section_headings():
     plain = "NAME\nPROFESSIONAL SUMMARY\nA student.\nTECHNICAL SKILLS\n- Languages: Python\nProjects\n- Built a thing\nEducation\nB.E."
     keys = lambda t: [k for k in parse_sections(t) if k != "_header"]
     assert keys(md) == keys(plain) == ["summary", "skills", "projects", "education"]
+
+
+def test_empty_model_reply_is_retried_then_reported(monkeypatch):
+    import httpx
+    from research.llm import OpenAICompatLLM
+
+    calls = []
+
+    class Resp:
+        status_code = 200
+        text = ""
+        def __init__(self, content): self._c = content
+        def raise_for_status(self): pass
+        def json(self): return {"choices": [{"message": {"content": self._c}}]}
+
+    llm = OpenAICompatLLM(model="m", base_url="http://example.invalid/v1", api_key="k", retries=3)
+    monkeypatch.setattr("research.llm.time.sleep", lambda s: None)
+    replies = iter(["", None, "a real resume"])
+    monkeypatch.setattr(llm._client, "post", lambda *a, **k: (calls.append(1), Resp(next(replies)))[1])
+    assert llm.complete("x") == "a real resume" and len(calls) == 3
+
+    always_empty = OpenAICompatLLM(model="m", base_url="http://example.invalid/v1", api_key="k", retries=2)
+    monkeypatch.setattr(always_empty._client, "post", lambda *a, **k: Resp(""))
+    with pytest.raises(RuntimeError):
+        always_empty.complete("x")
+
+
+def test_gpt_oss_on_a_hosted_api_defaults_to_low_reasoning(monkeypatch):
+    from research.llm import OpenAICompatLLM
+    monkeypatch.delenv("LLM_REASONING_EFFORT", raising=False)
+    assert OpenAICompatLLM(model="openai/gpt-oss-20b", base_url="https://api.groq.com/openai/v1").reasoning_effort == "low"
+    assert OpenAICompatLLM(model="qwen3.5-4b-8k", base_url="http://127.0.0.1:11434/v1").reasoning_effort == "none"

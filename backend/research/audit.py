@@ -39,6 +39,8 @@ def audit(original: str, job: dict, rewrite: str | None = None, llm: LLM | None 
     source = "pasted" if rewrite is not None else "generated"
     if rewrite is None:
         rewrite = rw.llm_rewrite(llm, original, job, seed=seed)
+        if not rewrite.strip():
+            raise RuntimeError("the model returned an empty rewrite")   # surfaces as a 503, not a blank audit
     rep = cl.verify(original, rewrite, terms)
     texts = {"orig": original, "llm": rewrite, "stripped": cl.strip_fully(original, rewrite, terms)}
     rounds = 0

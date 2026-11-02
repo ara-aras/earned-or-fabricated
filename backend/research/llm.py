@@ -62,8 +62,13 @@ class OpenAICompatLLM:
         # Thinking models (Qwen3, Qwen3.5, DeepSeek-R1 ...) otherwise spend hundreds of hidden
         # tokens per call -- ~40x slower on Ollama for no gain here. "none" turns it off;
         # set LLM_REASONING_EFFORT="" to send nothing (some hosted APIs reject the field).
-        default_effort = "none" if ":11434" in self.base_url else ""
+        # Groq's gpt-oss models reason before answering: at the default effort a resume rewrite took
+        # 20+ seconds and sometimes stalled, at "low" it takes about 2 seconds with the same quality.
+        local = ":11434" in self.base_url
+        default_effort = "none" if local else "low" if "gpt-oss" in self.model else ""
         self.reasoning_effort = os.environ.get("LLM_REASONING_EFFORT", default_effort)
+        if not local and timeout == 300.0:
+            timeout = 90.0                       # a hosted call that takes longer has stalled: retry it
         self._client = httpx.Client(timeout=timeout)
 
     def complete(self, prompt: str, *, system: str | None = None,
@@ -86,8 +91,11 @@ class OpenAICompatLLM:
                     raise httpx.HTTPStatusError(f"HTTP {r.status_code}: {r.text[:200]}",
                                                 request=r.request, response=r)
                 r.raise_for_status()
-                content = r.json()["choices"][0]["message"]["content"]
-                return re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+                content = r.json()["choices"][0]["message"].get("content") or ""
+                text = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+                if not text:                     # a reasoning model can spend its budget thinking and answer nothing
+                    raise ValueError("the model returned an empty reply")
+                return text
             except (httpx.HTTPError, KeyError, ValueError) as exc:
                 last = exc
                 time.sleep(2 ** attempt)
