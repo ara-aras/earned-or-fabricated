@@ -26,7 +26,7 @@ from pydantic import BaseModel
 from app.text_rules import strip_html
 from research.audit import audit
 from research.data import load_jobs, load_resumes
-from research.llm import make_llm
+from research.llm import DEFAULT_BASE_URL, make_llm
 
 ROOT = Path(__file__).resolve().parent.parent
 RESEARCH = ROOT / "research"
@@ -70,9 +70,22 @@ def _get_llm():
     return _llm
 
 
+def _llm_target() -> dict:
+    """Where the audit's model calls really go, so the demo can prove it (the key itself is never shown)."""
+    model, _, base = AUDIT_LLM.partition("@")
+    base = (base or os.environ.get("LLM_BASE_URL", DEFAULT_BASE_URL)).rstrip("/")
+    key = os.environ.get("LLM_API_KEY", "")
+    provider = "Groq" if "groq.com" in base else "local Ollama" if ":11434" in base else base
+    return {"model": model, "base_url": base, "provider": provider,
+            "api_key_set": key not in ("", "ollama", "your-groq-api-key")}
+
+
+print(f"[audit] model calls go to {_llm_target()['provider']} ({_llm_target()['model']} at {_llm_target()['base_url']})")
+
+
 @app.get("/api/health")
 def health():
-    return {"ok": True, "rewriter": AUDIT_LLM}
+    return {"ok": True, "rewriter": AUDIT_LLM, "llm": _llm_target()}
 
 
 @app.get("/api/jobs")
