@@ -173,11 +173,27 @@ def join_lines(lines: list[list[str]]) -> str:
 
 
 # --------------------------------------------------------------------------- tokens
+_STEM_SUFFIXES = ("ations", "ation", "ments", "ment", "ings", "ing", "ed", "es", "s", "e")
+
+
 def _stem(w: str) -> str:
-    for suf in ("ing", "ed", "es", "s"):
+    """Light stemmer so inflections of one word compare equal: manage / managing / management,
+    develop / developing / development, application / applications."""
+    for suf in _STEM_SUFFIXES:
         if len(w) > len(suf) + 3 and w.endswith(suf):
             return w[: -len(suf)]
     return w
+
+
+# Soft wording that says nothing checkable ("a quick learner with strong interest in growth").
+# It is left out when a line's words are compared with the original, so a summary sentence that
+# rephrases the candidate's own facts is judged on its real content words, and a line made only
+# of such wording claims nothing to verify. Fabricated substance still shows: "strong ERP
+# migration experience" keeps erp and migration, which the original lacks.
+GENERIC_WORDS = {_stem(w) for w in """quick learner learn strong interest interested growth passionate motivated
+adaptable dynamic driven enthusiastic eager dedicated committed proven excellent highly skilled solid good great
+well hands experience practical real world solving solution solutions technical technology environment environments
+continuous professional seamless efficient efficiency familiar knowledge understanding focus focused""".split()}
 
 
 def content_words(text: str) -> set[str]:
@@ -186,7 +202,7 @@ def content_words(text: str) -> set[str]:
 
 
 def containment(unit: str, against: set[str]) -> float:
-    words = content_words(unit)
+    words = content_words(unit) - GENERIC_WORDS
     return len(words & against) / len(words) if words else 1.0
 
 
@@ -258,6 +274,19 @@ def _flat(text: str) -> str:
     return " ".join(re.findall(r"[a-z0-9+#%]+", text.lower()))
 
 
+def _owner_in_context(verb: str, unit: str, orig_units: list[str]) -> bool:
+    """The original uses this verb (any inflection: manage / managing) in a line about the same
+    things, so it is the candidate's own wording, not a promotion. `unit` shares at least two
+    content words with that original line."""
+    root = _stem(verb)
+    mine = content_words(unit) - {root}
+    for o in orig_units:
+        if any(_stem(w) == root for w in re.findall(r"[a-z]+", o.lower())):
+            if len(mine & (content_words(o) - {root})) >= 2:
+                return True
+    return False
+
+
 def verify(original: str, rewrite: str, job_terms: Iterable[str] = (),
            judge: Callable[[str, str], bool] | None = None) -> Report:
     """Type and check every claim in `rewrite` against `original`.
@@ -301,7 +330,8 @@ def verify(original: str, rewrite: str, job_terms: Iterable[str] = (),
             limited = sorted(x for x in LIMITING if has_term(ev_l, x))
             if limited and sim >= 0.2:
                 ok, why = False, f"inflated: original says '{limited[0]}'"
-            elif any(has_term(ev_l, o) for o in OWNERSHIP) or (w in orig_owner and sim >= 0.2):
+            elif (any(has_term(ev_l, o) for o in OWNERSHIP) or (w in orig_owner and sim >= 0.2)
+                  or _owner_in_context(w, unit, orig_units)):
                 ok, why = True, "ownership stated in original"
             else:
                 ok, why = False, "ownership not stated in original"

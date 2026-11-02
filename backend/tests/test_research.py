@@ -224,3 +224,27 @@ def test_a_different_or_missing_degree_is_still_flagged():
     assert _unsupported_credentials("Education\nBachelor of Engineering", "Education\nMaster of Engineering")
     # the verb "be" in the original is not a degree
     assert _unsupported_credentials("Skills\nIt will be fine to be here", "Education\nBachelor of Science")
+
+
+def _flags(original, rewrite):
+    return [(c.type, c.text) for c in cl.verify(original, rewrite, []).claims if not c.supported]
+
+
+def test_inflected_verb_in_original_is_not_a_promotion():
+    orig = "Built a database-driven system to organize and manage second-hand car sales, keeping track of vehicle details, buyers and transactions."
+    rew = "- Simplified record handling and improved the efficiency of managing vehicle sales information."
+    assert not [f for f in _flags(orig, rew) if f[0] == "role_scope"]
+
+
+def test_summary_that_rephrases_the_candidates_facts_is_grounded():
+    orig = ("Passionate software engineer with a focus on continuous learning and real-world application of technology.\n"
+            "Built a database-driven platform. CookCraft is an AI-powered platform. Developing software applications.")
+    rew = ("Familiar with database management and AI-powered applications. "
+           "A quick learner with a strong interest in continuous technical growth and software development.")
+    assert _flags(orig, rew) == []
+
+
+def test_new_substance_in_a_soft_sentence_is_still_flagged():
+    orig = "Built a database-driven platform. Developing software applications."
+    assert _flags(orig, "Strong enterprise ERP migration experience across SAP landscapes.")
+    assert _flags("Assisted the team lead with testing.", "Led the testing team.")
