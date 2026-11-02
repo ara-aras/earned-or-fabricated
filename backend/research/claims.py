@@ -69,6 +69,34 @@ CREDENTIALS = ["bachelor", "master", "mba", "phd", "doctorate", "b.tech", "m.tec
                "scrum master", "six sigma green belt", "six sigma black belt", "aws certified",
                "certified", "certification", "certificate", "licensed", "license"]
 
+# The same degree is written many ways ("B.E.", "BE", "B.Tech", "Bachelors", "Bachelor of
+# Engineering"). A rewrite that spells the degree out is not a new claim when the original has
+# it abbreviated, so credentials are compared by level, not by spelling. Short abbreviations are
+# matched case-sensitively, or "be" and "me" in ordinary prose would count as degrees.
+_CRED_GROUP = {"bachelor": "bachelor", "b.tech": "bachelor", "b.sc": "bachelor", "b.e": "bachelor",
+               "master": "master", "m.tech": "master", "m.sc": "master", "m.e": "master",
+               "mba": "mba", "phd": "phd", "doctorate": "phd",
+               "bachelor of science": "bachelor", "bachelor of arts": "bachelor", "master of science": "master"}
+_CRED_WORDS = {
+    "bachelor": re.compile(r"\bbachelors?(?:['\u2019]s)?\b", re.I),
+    "master": re.compile(r"\bmasters?(?:['\u2019]s)?\b(?!\s+(?:of|in)\s+(?:ceremonies))", re.I),
+    "mba": re.compile(r"\bmaster\s+of\s+business\s+administration\b", re.I),
+    "phd": re.compile(r"\bph\.?\s?d\b|\bdoctorate\b|\bdoctor\s+of\s+philosophy\b", re.I),
+}
+_CRED_ABBREV = {
+    "bachelor": re.compile(r"(?<![A-Za-z.])(?:B\.?\s?E\.?|B\.?\s?Tech\.?|B\.?\s?Sc\.?|B\.?\s?S\.?|B\.?\s?A\.?|B\.?\s?Com\.?|B\.?\s?Eng\.?|BCA|BBA)(?![A-Za-z])"),
+    "master": re.compile(r"(?<![A-Za-z.])(?:M\.?\s?E\.?|M\.?\s?Tech\.?|M\.?\s?Sc\.?|M\.?\s?S\.?|M\.?\s?A\.?|M\.?\s?Eng\.?|MCA|MBA|M\.B\.A\.?)(?![A-Za-z])"),
+    "mba": re.compile(r"(?<![A-Za-z.])(?:MBA|M\.B\.A\.?)(?![A-Za-z])"),
+    "phd": re.compile(r"(?<![A-Za-z.])Ph\.?D\.?(?![A-Za-z])"),
+}
+
+
+def cred_groups_in(text: str) -> set[str]:
+    """Degree levels a text mentions, whichever way each is written."""
+    return ({g for g, rx in _CRED_WORDS.items() if rx.search(text)}
+            | {g for g, rx in _CRED_ABBREV.items() if rx.search(text)})
+
+
 _CRED_TERMS = sorted(set(CREDENTIALS) | set(DEGREE_TERMS)
                      - {"university", "college", "gpa", "coursework", "computer science", "mathematics",
                         "physics", "software engineering", "electrical engineering", "information technology",
@@ -245,6 +273,7 @@ def verify(original: str, rewrite: str, job_terms: Iterable[str] = (),
     orig_bare = {_bare(n) for n in orig_nums}
     orig_skills = skills_in(original, vocab)
     orig_owner = {w for w in OWNERSHIP if has_term(orig_l, w)}
+    orig_cred = cred_groups_in(original)
 
     orig_flat = _flat(original)
     units = units_of(rewrite)
@@ -289,7 +318,7 @@ def verify(original: str, rewrite: str, job_terms: Iterable[str] = (),
         for c in _CRED_TERMS:                # longest first: "aws certified" hides "certified"
             if has_term(ul, c) and not any(c in big for big in seen_cred):
                 seen_cred.append(c)
-                ok = has_term(orig_l, c)
+                ok = has_term(orig_l, c) or _CRED_GROUP.get(c) in orig_cred
                 rep.claims.append(Claim("credential", c, unit, i, ok,
                                         "credential in original" if ok else "credential not in original",
                                         evidence))

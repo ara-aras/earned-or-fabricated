@@ -200,3 +200,27 @@ def test_labelling_single_labeller_counts(tmp_path):
         w.writerow({"row_id": 2, "type": "skill", "verifier": "supported", "weight": 1, "label_a": "S"})
     res = labelling.evaluate(str(sheet))
     assert res["rows_with_gold"] == 2 and res["precision_unsupported"] == 1.0 and res["cohen_kappa"] is None
+
+
+def _unsupported_credentials(original, rewrite):
+    return [c.text for c in cl.verify(original, rewrite, []).claims if c.type == "credential" and not c.supported]
+
+
+def test_degree_spelled_out_is_not_a_new_credential():
+    for orig, rew in [
+        ("Education\nB.E. in Computer Science", "Education\nBachelor of Engineering in Computer Science"),
+        ("Education\nBE Computer Science", "Education\nBachelor of Engineering in Computer Science"),
+        ("Education\nB.Tech in Information Technology", "Education\nBachelor of Technology in Information Technology"),
+        ("Education\nBachelors in Commerce", "Education\nBachelor of Commerce"),
+        ("Education\nMSc Physics", "Education\nMaster of Science in Physics"),
+        ("Education\nMaster of Business Administration", "Education\nMBA"),
+    ]:
+        assert _unsupported_credentials(orig, rew) == [], (orig, rew)
+
+
+def test_a_different_or_missing_degree_is_still_flagged():
+    assert _unsupported_credentials("Education\nHigh school diploma", "Education\nBachelor of Engineering in CS")
+    assert _unsupported_credentials("Education\nBachelor of Engineering", "Education\nMBA from XYZ")
+    assert _unsupported_credentials("Education\nBachelor of Engineering", "Education\nMaster of Engineering")
+    # the verb "be" in the original is not a degree
+    assert _unsupported_credentials("Skills\nIt will be fine to be here", "Education\nBachelor of Science")
