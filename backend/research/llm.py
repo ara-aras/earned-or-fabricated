@@ -30,12 +30,17 @@ def _load_dotenv() -> None:
         env = folder / ".env"
         if not env.is_file():
             continue
-        for line in env.read_text(encoding="utf-8").splitlines():
+        # utf-8-sig: Notepad saves a hidden marker at the start of the file that would corrupt the first key.
+        for line in env.read_text(encoding="utf-8-sig").splitlines():
             line = line.strip()
+            if line.lower().startswith("export "):
+                line = line[7:].strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, _, value = line.partition("=")
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+            # "LLM BASE_URL" (a space for the underscore) is a common typo: read it as LLM_BASE_URL.
+            key = "_".join(key.split())
+            os.environ.setdefault(key, value.strip().strip('"').strip("'"))
 
 
 _load_dotenv()

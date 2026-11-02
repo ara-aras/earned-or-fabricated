@@ -288,3 +288,20 @@ def test_gpt_oss_on_a_hosted_api_defaults_to_low_reasoning(monkeypatch):
     monkeypatch.delenv("LLM_REASONING_EFFORT", raising=False)
     assert OpenAICompatLLM(model="openai/gpt-oss-20b", base_url="https://api.groq.com/openai/v1").reasoning_effort == "low"
     assert OpenAICompatLLM(model="qwen3.5-4b-8k", base_url="http://127.0.0.1:11434/v1").reasoning_effort == "none"
+
+
+def test_dotenv_tolerates_bom_space_in_name_and_quotes(tmp_path, monkeypatch):
+    import importlib
+    import research.llm as llm_mod
+    for k in ("T_BASE_URL", "T_KEY", "T_MODEL"):
+        monkeypatch.delenv(k, raising=False)
+    env = tmp_path / ".env"
+    env.write_bytes("﻿T BASE_URL=https://x.test/v1\nexport T_KEY=\"abc\"\n# c\nT_MODEL = m \n".encode("utf-8"))
+    fake_here = tmp_path / "research" / "llm.py"
+    fake_here.parent.mkdir()
+    fake_here.write_text("")
+    monkeypatch.setattr(llm_mod, "__file__", str(fake_here))
+    llm_mod._load_dotenv()
+    import os
+    assert os.environ["T_BASE_URL"] == "https://x.test/v1"
+    assert os.environ["T_KEY"] == "abc" and os.environ["T_MODEL"] == "m"
