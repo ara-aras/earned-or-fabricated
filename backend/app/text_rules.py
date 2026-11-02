@@ -97,7 +97,7 @@ def contact_info(text: str) -> dict:
 
 
 SECTION_ALIASES = {
-    "summary": ["summary", "profile", "objective", "about"],
+    "summary": ["summary", "profile", "objective", "about", "professional summary", "about me"],
     "skills": ["skills", "technical skills", "technologies", "tech stack"],
     "experience": ["experience", "work experience", "employment", "professional experience"],
     "projects": ["projects", "personal projects", "selected projects"],
@@ -113,7 +113,8 @@ def parse_sections(text: str) -> dict[str, list[str]]:
         line = raw.strip()
         if not line:
             continue
-        key = line.lower().rstrip(":").strip()
+        # "## TECHNICAL SKILLS" and "**Skills:**" are headings too: ChatGPT and most tools answer in Markdown.
+        key = re.sub(r"^[#*_\s]+|[#*_:\s]+$", "", line).lower()
         matched = next((s for s, al in SECTION_ALIASES.items() if key in al), None)
         if matched and len(line) < 40:
             current = matched

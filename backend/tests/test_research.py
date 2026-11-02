@@ -248,3 +248,11 @@ def test_new_substance_in_a_soft_sentence_is_still_flagged():
     orig = "Built a database-driven platform. Developing software applications."
     assert _flags(orig, "Strong enterprise ERP migration experience across SAP landscapes.")
     assert _flags("Assisted the team lead with testing.", "Led the testing team.")
+
+
+def test_markdown_headings_are_section_headings():
+    from app.text_rules import parse_sections
+    md = "# NAME\n\n## PROFESSIONAL SUMMARY\nA student.\n\n## TECHNICAL SKILLS\n- **Languages:** Python\n\n### Projects\n- Built a thing\n\n**Education**\nB.E."
+    plain = "NAME\nPROFESSIONAL SUMMARY\nA student.\nTECHNICAL SKILLS\n- Languages: Python\nProjects\n- Built a thing\nEducation\nB.E."
+    keys = lambda t: [k for k in parse_sections(t) if k != "_header"]
+    assert keys(md) == keys(plain) == ["summary", "skills", "projects", "education"]
